@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         commentList.appendChild(newComment);
         //здесь выдает ошибку
-        newComment.classList.add('comment',`comments`);
         nameInput.value = "";
         commentInput.value = "";
     });
