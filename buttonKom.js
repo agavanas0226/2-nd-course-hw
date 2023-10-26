@@ -6,28 +6,44 @@ const text = document.getElementById("comment-text");
 const editButton = document.getElementById("edit-button");
 const initEdit = () => {
     let edit = document.querySelectorAll('.edit-button');
-    let textComment = document.querySelectorAll('.comment-text');
+    for (const editButoon of edit) {
+        const index = editButoon.dataset.edit;
+        const isEditValue = commentsArray[index].isEdit;
+        console.log(isEditValue);
+        if (!isEditValue) {
 
-    for (let i = 0; i < edit.length; i++) {
-        let editMode = false;
 
-        edit[i].addEventListener('click', () => {
-            if (editMode) {
-                this.edit = "Редактировать";
-                textComment[i].removeAttribute('contentEditable');
+
+            editButoon.addEventListener('click', (event) => {
+                event.stopPropagation();
+
+                const index = editButoon.dataset.edit;
+
+
+                commentsArray[index].isEdit = true;
+                renderComments();
+            })
             } else {
-                this.edit = 'Сохранить';
-                textComment[i].setAttribute('contentEditable', true);
-                textComment[i].focus();
-            }
-            editMode = !editMode;
-        });
+            editButoon.addEventListener('click', () => {
+                editButoon.addEventListener('click', (event) => {
+                    let textComment = document.querySelector('.text-comment');
+                    event.stopPropagation();
+                    const index = editButoon.dataset.edit;
+                    const comment = commentsArray[index].comment;
+    
+                    const value = document.querySelector('input').value;
+                    commentsArray[index].comment = value;
+                    commentsArray[index].isEdit = false;
+                renderComments();
+            })
+        })
     }
 };
 const initDeleteButtonsListeners = () => {
     const deleteButtonsElements = document.querySelectorAll(".delete-button");
     for (const deleteButtonsElement of deleteButtonsElements) {
-        deleteButtonsElement.addEventListener('click', () => {
+        deleteButtonsElement.addEventListener('click', (event) => {
+            event.stopPropagation();
             console.log("Удаляю элемент...");
             const index = deleteButtonsElement.dataset.index;
             console.log(index);
@@ -47,7 +63,8 @@ const commentsArray = [
         comment: 'Это будет первый комментарий на этой странице',
         like: 3,
         userLike: false,
-        paint: ''
+        paint: '',
+        isEdit: false
     },
     {
         name: 'Варвара Н.',
@@ -55,7 +72,8 @@ const commentsArray = [
         comment: 'Мне нравится как оформлена эта страница! ❤',
         like: 75,
         userLike: true,
-        paint: '-active-like'
+        paint: '-active-like',
+        isEdit: false
     }
 ];
 
@@ -68,7 +86,8 @@ initDeleteButtonsListeners();
 const likes = () => {
     const likeButtons = document.querySelectorAll('.like-button');
     for (const likeButton of likeButtons) {
-        likeButton.addEventListener('click', () => {
+        likeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
             const index = likeButton.dataset.index;
             if (commentsArray[index].userLike === false) {
                 commentsArray[index].paint = '-active-like';
@@ -83,7 +102,31 @@ const likes = () => {
         });
     };
 };
+const answer = () => {
+    const answerElement = document.querySelectorAll(".comment");
+    for (const answerElements of answerElement) {
+        answerElements.addEventListener('click', (event) => {
+            event.stopPropagation();
 
+            const answerIndex = answerElements.dataset.answer;
+            const addFormText = document.querySelector(".add-form-text");
+
+            addFormText.value = `${commentsArray[answerIndex].name} \n ${commentsArray[answerIndex].comment}`
+
+
+            renderComments();
+
+
+
+
+
+
+        });
+
+    };
+};
+
+answer();
 
 
 
@@ -92,38 +135,38 @@ const likes = () => {
 const renderComments = () => {
     const commentsHtml = commentsArray.map((item, index) => {
         return `
-          <li class="comment">
+        <li class="comment">
                 <div class="comment-header">
                   <div>${item.name}</div>
                   <div>${item.date}</div>
                 </div>
                 <div class="comment-body">
-                  <div class="comment-text">
-                    ${item.comment}
-                    
-                  </div>
-                  
-                </div>
-                <div class="comment-footer">
-                <button class="edit-button">Редактировать</button>
-                <button data-index='${index}' class="delete-button">Удалить</button>
+                ${!item.isEdit ? `<div data-comment='${index}' class="comment-text" >
+                ${item.comment}
                 
-                  <div class="likes">
-                    <span class="likes-counter">${item.like}</span>
-                    <button data-index='${index}' class="like-button ${item.paint}"</button>
-                  
-                  </div>
-                </div>
+                </div > ` : `<input value='${item.comment}'>`}                  
+                </div >
+    <div class="comment-footer">
+    
+        <button data-answer="${index}" class="answer-button">Ответить</button>
+        <button data-edit="${index}" class="edit-button">${!item.isEdit ? "Редактировать" : "Сохранить"}</button>
+        <button data-index='${index}' class="delete-button">Удалить</button>
+        
+        <div class="likes">
+            <span class="likes-counter">${item.like}</span>
+            <button data-index='${index}' class="like-button ${item.paint}"</button>
+    </div>
+                </div >
                 
-              </li>
-          `})
+              </li >
+    `})
           .join('');
           ulElement.innerHTML = commentsHtml;
           likes();
           initDeleteButtonsListeners();
           initEdit();
       
-      
+          answer();
       
       
       };
@@ -182,15 +225,18 @@ textElement.addEventListener('input', () => {
             return;
         }
     const currentDate = new Date();
-    const dateString = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+    const dateString = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()} `;
 
     commentsArray.push({
         name: nameElement.value,
         date: dateString,
-        comment: textElement.value,
+        comment: textElement.value 
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;"),
         like: 0,
         userLike: false,
         paint: '',
+        isEdit: false
     });
     renderComments();
 
@@ -199,4 +245,4 @@ textElement.addEventListener('input', () => {
     buttonElement.disabled = true;
 });
 
-buttonElement.disabled = true;
+buttonElement.disabled = true;}
