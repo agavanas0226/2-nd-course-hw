@@ -6,38 +6,44 @@ const text = document.getElementById("comment-text");
 const editButton = document.getElementById("edit-button");
 const initEdit = () => {
     let edit = document.querySelectorAll('.edit-button');
+    let textComment = document.querySelectorAll('.comment-text');
     for (const editButoon of edit) {
         const index = editButoon.dataset.edit;
         const isEditValue = commentsArray[index].isEdit;
         console.log(isEditValue);
-        if (!isEditValue) {
-
-
-
-            editButoon.addEventListener('click', (event) => {
-                event.stopPropagation();
-
+        for (const editButoon of edit) {
+            const index = editButoon.dataset.edit;
+            const isEditValue = commentsArray[index].isEdit;
+            if (!isEditValue) {
+    
+    
+    
+                editButoon.addEventListener('click', () => {
+    
                 const index = editButoon.dataset.edit;
-
-
+    
+                const commentEdit = commentsArray[index];
+    
                 commentsArray[index].isEdit = true;
                 renderComments();
+                
             })
-            } else {
+        } else {
             editButoon.addEventListener('click', () => {
-                editButoon.addEventListener('click', (event) => {
-                    let textComment = document.querySelector('.text-comment');
-                    event.stopPropagation();
-                    const index = editButoon.dataset.edit;
-                    const comment = commentsArray[index].comment;
-    
-                    const value = document.querySelector('input').value;
-                    commentsArray[index].comment = value;
-                    commentsArray[index].isEdit = false;
+                let textComment = document.querySelectorAll('.comment-text');
+                console.log(textComment)
+
+                const index = editButoon.dataset.textComment;
+                const indexArr = commentsArray[index];
+                console.log(indexArr)
+
+
+                textComment.value = commentsArray[index].comment;
                 renderComments();
             })
-        })
+        }
     }
+}
 };
 const initDeleteButtonsListeners = () => {
     const deleteButtonsElements = document.querySelectorAll(".delete-button");
@@ -228,7 +234,9 @@ textElement.addEventListener('input', () => {
     const dateString = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()} `;
 
     commentsArray.push({
-        name: nameElement.value,
+        name: nameElement.value
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;"),
         date: dateString,
         comment: textElement.value 
             .replaceAll("<", "&lt;")
@@ -245,4 +253,4 @@ textElement.addEventListener('input', () => {
     buttonElement.disabled = true;
 });
 
-buttonElement.disabled = true;}
+buttonElement.disabled = true;
