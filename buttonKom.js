@@ -4,6 +4,110 @@ const buttonElement = document.getElementById("buttonPush");
 const ulElement = document.getElementById("ul");
 const text = document.getElementById("comment-text");
 const editButton = document.getElementById("edit-button");
+const formHide = document.getElementById("form-add");
+let commentsArray = [
+
+];
+
+const fetchArray = () => {
+
+    fetch("https://wedev-api.sky.pro/api/v1/:kolesnikova_anastasiia/comments", {
+
+        method: "GET",
+
+    }
+    ).then((response) => {
+        if (response.status === 500) {
+            throw new Error("Ошибка сервера")
+        };
+        return response.json();
+    }).then((responseData) => {
+        commentsArray = [];
+        responseData.comments.map((element) => {
+            const newDate = new Date(element.date);
+            const elementObj = {
+                comment: element.text,
+                name: element.author.name,
+                like: element.likes,
+                userLike: element.isLiked,
+                date: newDate.toLocaleString()
+
+            }
+            commentsArray.push(elementObj);
+
+        }
+
+
+        )
+        document.getElementById("loadingFeed").style.display = 'none';
+        renderComments();
+    }).catch((Error) => {
+        if (Error.message === 'Failed to fetch') {
+            alert("Проблемы с интернетом");
+        } else {
+            alert(Error.message)
+        }
+    })
+};
+fetchArray();
+
+
+const arrayPost = () => {
+    document.getElementById("form-add").style.display = 'none';
+    document.getElementById("loadingMessage").style.display = 'block';
+
+
+
+
+    fetch("https://wedev-api.sky.pro/api/v1/:kolesnikova-anastasiia/comments", {
+        method: "POST",
+        body: JSON.stringify({
+            text: textElement.value
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;"),
+            name: nameElement.value
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;"),
+                forceError: true,
+        })
+
+
+
+    }).then((thenresponse) => {
+        if (thenresponse.status === 500) {
+            arrayPost();
+            // throw new Error("Ошибка сервера");
+        } else if (thenresponse.status === 400) {
+            throw new Error("Имя или текст комментария должны иметь 3 и более символов");
+        }
+        if (thenresponse.ok) {
+
+
+            nameElement.value = '';
+            textElement.value = '';
+            buttonElement.disabled = true;
+        }
+        fetchArray();
+        }).catch((cathError) => {
+        document.getElementById("form-add").style.display = 'block';	        if (cathError.message === 'Failed to fetch') {
+        document.getElementById("loadingMessage").style.display = 'none';	            alert("Проблемы с интернетом");
+        } else {
+            alert(`${cathError.message}`)
+        }
+    })
+        .finally(() => {
+
+
+            setTimeout(function () {
+                document.getElementById("form-add").style.display = 'flex';
+                document.getElementById("loadingMessage").style.display = 'none';
+
+            }, 1000);
+
+        });
+
+};
+
 const initEdit = () => {
     let edit = document.querySelectorAll('.edit-button');
     let textComment = document.querySelectorAll('.comment-text');
@@ -18,27 +122,25 @@ const initEdit = () => {
     
     
     
-                editButoon.addEventListener('click', () => {
-    
+                editButoon.addEventListener('click', (event) => {
+                event.stopPropagation();    
                 const index = editButoon.dataset.edit;
     
-                const commentEdit = commentsArray[index];
     
                 commentsArray[index].isEdit = true;
                 renderComments();
                 
             })
         } else {
-            editButoon.addEventListener('click', () => {
-                let textComment = document.querySelectorAll('.comment-text');
-                console.log(textComment)
+                editButoon.addEventListener('click', (event) => {
+                    let textComment = document.querySelector('.text-comment');
+                    event.stopPropagation();
+                    const index = editButoon.dataset.edit;
+                const comment = commentsArray[index].comment;
 
-                const index = editButoon.dataset.textComment;
-                const indexArr = commentsArray[index];
-                console.log(indexArr)
-
-
-                textComment.value = commentsArray[index].comment;
+                const value = document.querySelector('input').value;
+                commentsArray[index].comment = value;
+                commentsArray[index].isEdit = false;
                 renderComments();
             })
         }
@@ -62,26 +164,6 @@ const initDeleteButtonsListeners = () => {
     };
 };
 
-const commentsArray = [
-    {
-        name: 'Глеб Фокин',
-        date: '12.02.22 12:18',
-        comment: 'Это будет первый комментарий на этой странице',
-        like: 3,
-        userLike: false,
-        paint: '',
-        isEdit: false
-    },
-    {
-        name: 'Варвара Н.',
-        date: '13.02.22 19:22',
-        comment: 'Мне нравится как оформлена эта страница! ❤',
-        like: 75,
-        userLike: true,
-        paint: '-active-like',
-        isEdit: false
-    }
-];
 
 initDeleteButtonsListeners();
 
@@ -233,24 +315,10 @@ textElement.addEventListener('input', () => {
     const currentDate = new Date();
     const dateString = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()} `;
 
-    commentsArray.push({
-        name: nameElement.value
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;"),
-        date: dateString,
-        comment: textElement.value 
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;"),
-        like: 0,
-        userLike: false,
-        paint: '',
-        isEdit: false
-    });
+    arrayPost();
     renderComments();
 
-    nameElement.value = '';
-    textElement.value = '';
-    buttonElement.disabled = true;
+    
 });
 
 buttonElement.disabled = true;
