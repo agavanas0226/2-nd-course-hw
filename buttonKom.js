@@ -141,8 +141,8 @@ answer();
 const renderComments = () => {
     const commentsHtml = commentsArray.map((item, index) => {
         return `
-        <li class="comment">
-                <div class="comment-header">
+        <li class="comment" data-answer="${index}">
+                <div  class="comment-header" >
                   <div>${item.name}</div>
                   <div>${item.date}</div>
                 </div>
