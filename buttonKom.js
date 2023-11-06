@@ -40,6 +40,7 @@ const fetchArray = () => {
 
         )
         document.getElementById("loadingFeed").style.display = 'none';
+        
         renderComments();
     }).catch((Error) => {
         if (Error.message === 'Failed to fetch') {
@@ -88,10 +89,12 @@ const arrayPost = () => {
             buttonElement.disabled = true;
         }
         fetchArray();
-        }).catch((cathError) => {
-        document.getElementById("form-add").style.display = 'block';	        if (cathError.message === 'Failed to fetch') {
-        document.getElementById("loadingMessage").style.display = 'none';	            alert("Проблемы с интернетом");
+    }).catch((cathError) => {
+        if (cathError.message === 'Failed to fetch') {
+            alert("Проблемы с интернетом");
         } else {
+
+
             alert(`${cathError.message}`)
         }
     })
