@@ -1,4 +1,4 @@
-fetch("https://wedev-api.sky.pro/api/v1/:kolesnikova-anastasiia/coments").then((responseData) => {
+fetch("https://wedev-api.sky.pro/api/v1/:kolesnikova-anastasiia/comments").then((responseData) => {
     return responseData;
 }).then((dataResponse) => {
     console.log(dataResponse.status)

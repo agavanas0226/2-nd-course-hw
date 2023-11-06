@@ -11,7 +11,7 @@ let commentsArray = [
 
 const fetchArray = () => {
 
-    fetch("https://wedev-api.sky.pro/api/v1/:kolesnikova_anastasiia/comments", {
+    fetch("https://wedev-api.sky.pro/api/v1/:kolesnikova-anastasiia/comments", {
 
         method: "GET",
 
