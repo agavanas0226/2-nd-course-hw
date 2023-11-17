@@ -1,13 +1,13 @@
-import { answer, initDeleteButtonsListeners, initEdit, likes } from "./buttonKom.js";
-
+import { answer, autoInfo, initDeleteButtonsListeners, initEdit, likes } from "./buttonKom.js";
+import { renderForm, renderFormButton } from "./renderForm.js";
+renderFormButton
 export const renderComments = (commentsArray) => {
-    const ulElement = document.getElementById("ul");
+  const app = document.querySelector(".app");
 
 
+  const commentsHtml = commentsArray?.map((item, index) => {
 
-    const commentsHtml = commentsArray?.map((item, index) => {
-
-        return `
+    return `
           <li class="comment" data-answer="${index}">
                 <div class="comment-header">
                   <div>${item.name}</div>
@@ -35,14 +35,24 @@ export const renderComments = (commentsArray) => {
                 
               </li >
     `})
-        .join('');
-
-    ulElement.innerHTML = commentsHtml;
+    .join('');
+    const listHtml = `<ul id="ul" class="comments">
+      ${commentsHtml}
+    </ul>`
+    app.innerHTML = listHtml;
     likes();
     initDeleteButtonsListeners();
     initEdit();
+  
     answer();
-
+    console.log(autoInfo)
+    if (autoInfo) {
+      renderForm();
+    } else {
+      renderFormButton();
+  
+  
+    }
 
 
 
