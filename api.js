@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { saveUserInLocalStorage } from "./helpers.js";
 import { autoInfo, commentsArray, getToken, setComments, userLogin } from "./buttonKom.js";
 import { renderComments } from "./render.js";
@@ -19,6 +20,8 @@ export const fetchArray = () => {
 
         let newComments = responseData.comments.map((element) => {
             const newDate = new Date(element.date);
+            const dateFormat = format(newDate, 'yyyy-MM-dd hh.mm.ss')
+            console.log(dateFormat)
             return {
                 comment: element.text,
                 name: element.author.name,
