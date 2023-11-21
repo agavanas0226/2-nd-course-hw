@@ -4,19 +4,22 @@
 <title>Проект "Комменты"</title>
 <meta charset="utf-8" />
 <link rel="stylesheet" href="styles.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@1&family=Poppins:ital,wght@1,600&display=swap"  rel="stylesheet">
 </head>
 
 <body>
 <div class="container">
-<ul id="ul" class="comments"></ul>
-<div class="add-form">
-<input id="inputName" type="text" class="add-form-name" placeholder="Введите ваше имя" />
-<textarea id="inputText" type="textarea" class="add-form-text" placeholder="Введите ваш коментарий"
-  rows="4"></textarea>
-<div class="add-form-row">
-  <button id="buttonPush" class="add-form-button">Написать</button></div>
-</div>
-</div>
+  <div class="app">
+    <p id="loadingFeed" class="hidden">Комментарий загружается...</p>
+
+
+
+
+    <p id="loadingMessage" class="hidden" style="display: none;">Комментарий добавляется...</p>
+  </div>
+  <div class="footer">
 </div>
 </body>
 
@@ -25,7 +28,7 @@
 background-color: rgb(6, 236, 26);
 }
 </style>
-<script src="buttonKom.js"></script>
+<script src="buttonKom.js" type="module"></script>
 </body>
 
 </html>

@@ -1,38 +1,76 @@
+import { fetchArray, arrayPost } from "./api.js"
+import { renderComments } from "./render.js";
 const nameElement = document.getElementById("inputName");
 const textElement = document.getElementById("inputText");
 const buttonElement = document.getElementById("buttonPush");
-const ulElement = document.getElementById("ul");
-const text = document.getElementById("comment-text");
-const editButton = document.getElementById("edit-button");
-const initEdit = () => {
-    let edit = document.querySelectorAll('.edit-button');
-    let textComment = document.querySelectorAll('.comment-text');
+export function getToken() {
+    const token = `Bearer ${autoInfo.user.token}`;
+    return token;
+}
 
-    for (let i = 0; i < edit.length; i++) {
-        let editMode = false;
+export let autoInfo = JSON.parse(localStorage.getItem("user"));
+export const userLogin = (dataInfo) => {
+    autoInfo = dataInfo;
 
-        edit[i].addEventListener('click', () => {
-            if (editMode) {
-                this.edit = "Редактировать";
-                textComment[i].removeAttribute('contentEditable');
-            } else {
-                this.edit = 'Сохранить';
-                textComment[i].setAttribute('contentEditable', true);
-                textComment[i].focus();
-            }
-            editMode = !editMode;
-        });
-    }
+}
+
+export let commentsArray = [
+
+];
+fetchArray();
+
+
+export const setComments = (comments) => {
+    commentsArray = comments;
 };
-const initDeleteButtonsListeners = () => {
+export const initEdit = () => {
+        let edit = document.querySelectorAll('.edit-button');
+    let textComment = document.querySelectorAll('.comment-text');
+    for (const editButoon of edit) {
+        const index = editButoon.dataset.edit;
+        const isEditValue = commentsArray[index].isEdit;
+        console.log(isEditValue);
+        for (const editButoon of edit) {
+            const index = editButoon.dataset.edit;
+            const isEditValue = commentsArray[index].isEdit;
+            if (!isEditValue) {
+    
+    
+    
+                editButoon.addEventListener('click', (event) => {
+                event.stopPropagation();    
+                const index = editButoon.dataset.edit;
+    
+    
+                commentsArray[index].isEdit = true;
+                renderComments(commentsArray);                
+            })
+        } else {
+                editButoon.addEventListener('click', (event) => {
+                    let textComment = document.querySelector('.text-comment');
+                    event.stopPropagation();
+                    const index = editButoon.dataset.edit;
+                const comment = commentsArray[index].comment;
+
+                const value = document.querySelector('input').value;
+                commentsArray[index].comment = value;
+                commentsArray[index].isEdit = false;
+                renderComments(commentsArray);
+            })
+        }
+    }
+}
+};
+export const initDeleteButtonsListeners = () => {
     const deleteButtonsElements = document.querySelectorAll(".delete-button");
     for (const deleteButtonsElement of deleteButtonsElements) {
-        deleteButtonsElement.addEventListener('click', () => {
+        deleteButtonsElement.addEventListener('click', (event) => {
+            event.stopPropagation();
             console.log("Удаляю элемент...");
             const index = deleteButtonsElement.dataset.index;
             console.log(index);
             commentsArray.splice(index, 1);
-            renderComments();
+            renderComments(commentsArray);
 
 
 
@@ -40,24 +78,6 @@ const initDeleteButtonsListeners = () => {
     };
 };
 
-const commentsArray = [
-    {
-        name: 'Глеб Фокин',
-        date: '12.02.22 12:18',
-        comment: 'Это будет первый комментарий на этой странице',
-        like: 3,
-        userLike: false,
-        paint: ''
-    },
-    {
-        name: 'Варвара Н.',
-        date: '13.02.22 19:22',
-        comment: 'Мне нравится как оформлена эта страница! ❤',
-        like: 75,
-        userLike: true,
-        paint: '-active-like'
-    }
-];
 
 initDeleteButtonsListeners();
 
@@ -65,10 +85,11 @@ initDeleteButtonsListeners();
 
 
 
-const likes = () => {
+export const likes = () => {
     const likeButtons = document.querySelectorAll('.like-button');
     for (const likeButton of likeButtons) {
-        likeButton.addEventListener('click', () => {
+        likeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
             const index = likeButton.dataset.index;
             if (commentsArray[index].userLike === false) {
                 commentsArray[index].paint = '-active-like';
@@ -79,81 +100,40 @@ const likes = () => {
                 commentsArray[index].like -= 1;
                 commentsArray[index].userLike = false;
             }
-            renderComments();
+            renderComments(commentsArray);
         });
     };
 };
+export const answer = () => {
+    const answerElement = document.querySelectorAll(".answer-button");
+    for (const answerElements of answerElement) {
+        answerElements.addEventListener('click', (event) => {
+            event.stopPropagation();
+
+            const answerIndex = answerElements.dataset.answer;
+            const addFormText = document.querySelector(".add-form-text");
+
+            addFormText.value = `${commentsArray[answerIndex].name} \n ${commentsArray[answerIndex].comment}`
+
+
+            renderComments(commentsArray);
 
 
 
 
 
 
-const renderComments = () => {
-    const commentsHtml = commentsArray.map((item, index) => {
-        return `
-          <li class="comment">
-                <div class="comment-header">
-                  <div>${item.name}</div>
-                  <div>${item.date}</div>
-                </div>
-                <div class="comment-body">
-                  <div class="comment-text">
-                    ${item.comment}
-                    
-                  </div>
-                  
-                </div>
-                <div class="comment-footer">
-                <button class="edit-button">Редактировать</button>
-                <button data-index='${index}' class="delete-button">Удалить</button>
-                
-                  <div class="likes">
-                    <span class="likes-counter">${item.like}</span>
-                    <button data-index='${index}' class="like-button ${item.paint}"</button>
-                  
-                  </div>
-                </div>
-                
-              </li>
-          `})
-          .join('');
-          ulElement.innerHTML = commentsHtml;
-          likes();
-          initDeleteButtonsListeners();
-          initEdit();
-      
-      
-      
-      
-      };
-      renderComments();
+        });
 
-buttonElement.disabled = true;
-nameElement.addEventListener('input', () => {
-    if ((nameElement.value === '') || (textElement.value === '')) {
-        buttonElement.disabled = true;
-        return;
-    }
-    else {
-        buttonElement.disabled = false;
-        return;
-    }
-});
+    };
+};
 
-textElement.addEventListener('input', () => {
-    if ((textElement.value === '') || (nameElement.value === '')) {
-        buttonElement.disabled = true;
-        return;
-    }
-    else {
-        buttonElement.disabled = false;
+answer();
 
-        return;
-    }
-})
 
-    function fieldSubmit(event) {
+
+
+    export function fieldSubmit(event) {
         event.preventDefault();
         if (event.keyCode === 13) {
             document.getElementById("buttonPush").click();
@@ -169,34 +149,31 @@ textElement.addEventListener('input', () => {
         };
     
     };
-    nameElement.addEventListener("input", buttonHide);
-    textElement.addEventListener("input", buttonHide);
+    export function addPost() {
+        const nameElement = document.getElementById("inputName");
+        const textElement = document.getElementById("inputText");
+        const buttonElement = document.getElementById("buttonPush");
+        buttonElement.addEventListener('click', () => {
     
-    buttonElement.addEventListener('click', () => {
-        nameElement.classList.remove('error');
-        textElement.classList.remove('error');
+            nameElement.classList.remove('error');
+            textElement.classList.remove('error');
     
-        if ((nameElement.value || textElement.value) === '') {
-            nameElement.classList.add('error');
-            textElement.classList.add('error');
-            return;
-        }
-    const currentDate = new Date();
-    const dateString = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
-
-    commentsArray.push({
-        name: nameElement.value,
-        date: dateString,
-        comment: textElement.value,
-        like: 0,
-        userLike: false,
-        paint: '',
-    });
-    renderComments();
-
-    nameElement.value = '';
-    textElement.value = '';
-    buttonElement.disabled = true;
-});
-
-buttonElement.disabled = true;
+            if ((nameElement.value || textElement.value) === '') {
+                nameElement.classList.add('error');
+                textElement.classList.add('error');
+                return;
+            }
+    
+    
+    
+    
+    
+            arrayPost();
+    
+    
+    
+    
+    
+    
+        });
+    }
